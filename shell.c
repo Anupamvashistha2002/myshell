@@ -25,7 +25,7 @@ int main(void)
             printf("we are in parent");
             waitpid(pid,NULL,0);
         }
-
+        printf("The command array has : %s\n",command);
 
     }
     return 0;
