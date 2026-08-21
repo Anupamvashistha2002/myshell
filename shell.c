@@ -2,30 +2,60 @@
 #include<sys/wait.h>
 #include<unistd.h>
 #include<string.h>
+#include "parse.h"
+#include<err.h>
+#include<errno.h>
+
 int main(void)
 
 {
     char command[1024];
+    char *argv[MAX_ARGS];
 
     while(1)
     {
         printf("myshell> ");
         fflush(stdout);
-        fgets(command,sizeof(command),stdin);
-        command[strcspn(command,"\n")]='\0';
-        pid_t pid=fork();
-        if(pid==0)//child
+        if(fgets(command,sizeof(command),stdin)==NULL)
         {
-            printf("About to do ls \n");
-            execlp(command,command,NULL);
-            perror("Failed");
+            perror("FAILED:");
             return 1;
         }
+        command[strcspn(command,"\n")]='\0';
+        int argc=parse(command,argv);
+
+        if(argc==0)
+        {
+            fprintf(stderr,"Failed:Please enter arguments");
+            return 1;
+        }
+
+        pid_t pid=fork();
+        if(pid<0)
+        {
+
+            printf("Failed to fork \n");
+            return 1;
+        }
+        else if(pid==0)//child
+        {
+            // printf("About to do ls \n");
+            // execlp(command,command,NULL);
+            // perror("Failed");
+            // return 1;
+        //EXECVP implementation
+        if(execvp(argv[0],argv)==-1)
+
+        {
+            perror("Failed \n");
+            return 1;
+        }
+        }
         else{
-            printf("we are in parent");
+            
             waitpid(pid,NULL,0);
         }
-        printf("The command array has : %s\n",command);
+
 
     }
     return 0;
