@@ -6,5 +6,7 @@
 #Build outputs
 build/
 bin/
+#ignore log file
+*.log
 #Ignore my exe
 /?
