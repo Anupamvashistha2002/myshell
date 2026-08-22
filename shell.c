@@ -6,6 +6,7 @@
 #include<err.h>
 #include<errno.h>
 
+
 int main(void)
 
 {
@@ -23,6 +24,24 @@ int main(void)
         }
         command[strcspn(command,"\n")]='\0';
         int argc=parse(command,argv);
+
+        //cd command implementation
+        if(strcmp(argv[0],"cd")==0)
+        {
+
+            if(chdir(argv[1])==-1)  //Location not found
+            {
+                perror("cd");
+            }
+            else if(argv[1]==NULL) //No path provided to cd like : cd <nothing_here>
+            {
+                perror("Please provide argument to cd: \n");
+            }
+            else{
+            printf("Working Directory changed\n");
+            }
+            continue;
+        }
 
         if(argc==0)
         {

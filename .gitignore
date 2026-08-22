@@ -8,5 +8,7 @@ build/
 bin/
 #ignore log file
 *.log
+#Dependency files
+*.d
 #Ignore my exe
 /?
