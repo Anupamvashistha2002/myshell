@@ -24,31 +24,32 @@ int main(void)
         }
         command[strcspn(command,"\n")]='\0';
         int argc=parse(command,argv);
-
+        if (argc==0)
+        {
+            continue;
+        }
+        
         //cd command implementation
         if(strcmp(argv[0],"cd")==0)
         {
+            if(argv[1]==NULL)
+            {
+              fprintf(stderr,"cd: missing args \n");
+            }
 
-            if(chdir(argv[1])==-1)  //Location not found
+            else if(chdir(argv[1])==-1)  //Location not found
             {
                 perror("cd");
             }
-            else if(argv[1]==NULL) //No path provided to cd like : cd <nothing_here>
-            {
-                perror("Please provide argument to cd: \n");
-            }
-            else{
-            printf("Working Directory changed\n");
-            }
+            // else if(argv[1]==NULL) //No path provided to cd like : cd <nothing_here>
+            // {
+            //     perror("Please provide argument to cd: \n");
+            // }
+           
             continue;
         }
 
-        if(argc==0)
-        {
-            fprintf(stderr,"Failed:Please enter arguments");
-            return 1;
-        }
-
+     
         pid_t pid=fork();
         if(pid<0)
         {
