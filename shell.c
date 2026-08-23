@@ -28,7 +28,10 @@ int main(void)
         {
             continue;
         }
-        
+        if(strcmp(argv[0],"exit")==0)
+        {
+            break;
+        }
         //cd command implementation
         if(strcmp(argv[0],"cd")==0)
         {
