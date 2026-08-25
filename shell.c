@@ -12,6 +12,7 @@ int main(void)
 {
     char command[1024];
     char *argv[MAX_ARGS];
+    char buf[64];
 
     while(1)
     {
@@ -28,7 +29,28 @@ int main(void)
         {
             continue;
         }
+<<<<<<< Updated upstream
         
+=======
+        if(strcmp(argv[0],"exit")==0)
+        {
+            break;
+        }
+        //implement pwd
+        if(strcmp(argv[0],"pwd")==0)
+        {
+            if(getcwd(buf,sizeof(buf))!=NULL)
+            {
+                printf("current working dir is: %s\n",buf);
+                
+            }
+            else{
+                perror("getcwd");
+                
+            }
+            continue;
+        }
+>>>>>>> Stashed changes
         //cd command implementation
         if(strcmp(argv[0],"cd")==0)
         {
@@ -48,7 +70,7 @@ int main(void)
            
             continue;
         }
-
+            //impleme
      
         pid_t pid=fork();
         if(pid<0)
