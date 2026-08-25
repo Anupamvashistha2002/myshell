@@ -3,6 +3,7 @@
 #executables
 *.exe
 *.out
+shell
 #Build outputs
 build/
 bin/
