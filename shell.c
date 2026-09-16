@@ -5,6 +5,7 @@
 #include "parse.h"
 #include<err.h>
 #include<errno.h>
+#include<fcntl.h>
 
 
 int main(void)
@@ -32,10 +33,7 @@ int main(void)
         {
             break;
         }
-                if(strcmp(argv[0],"exit")==0)
-        {
-            break;
-        }
+        
         //implement pwd
         if(strcmp(argv[0],"pwd")==0)
         {
@@ -69,7 +67,37 @@ int main(void)
            
             continue;
         }
+        int redirect=0;
+        char *output_file=NULL;
+        int syntax_error=0;
 
+        for(int i=0;i<argc;i++)
+        {
+
+            
+            if(strcmp(argv[i],">")==0)
+            {
+                if(argv[i+1]==NULL)
+                {
+                    fprintf(stderr,"myshell: expected filename after >\n");
+                    syntax_error=1;
+                    break;
+                }
+                redirect=1;
+                output_file=argv[i+1];
+                argv[i]=NULL;
+                break;
+            }
+        }
+        // printf("redirect=%d\n",redirect);
+        // if(output_file!=NULL)
+        // {
+        //     printf("output_file=%s\n",output_file);
+        // }
+        if(syntax_error)
+        {
+            continue;
+        }
      
         pid_t pid=fork();
         if(pid<0)
@@ -85,6 +113,32 @@ int main(void)
             // perror("Failed");
             // return 1;
         //EXECVP implementation
+        // int fd=open(output_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
+        // if(fd==-1)
+        // {
+        //     perror("failed to open: \n");
+        //     return 1;
+        // }
+        // dup2(fd,STDOUT_FILENO);
+        // printf("check av \n");
+        //IMPLEMENTED REDIRECTION(>)
+        if(redirect==1)
+        {
+            int fd=open(output_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
+            if(fd==-1)
+            {
+                perror("Failed to open: \n");
+                return 1;
+            }
+            int dval=dup2(fd,STDOUT_FILENO);
+            if(dval==-1)
+            {
+                perror("fail \n");
+                return 1;
+            }
+            close(fd);
+        }
+
         if(execvp(argv[0],argv)==-1)
 
         {
