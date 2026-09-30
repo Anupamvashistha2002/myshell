@@ -69,7 +69,8 @@ int main(void)
         }
         int redirect=0;
         int redirect_append=0;
-        char *output_file=NULL;
+        int redirect_input=0;
+        char *entered_file=NULL;
         int syntax_error=0;
 
         for(int i=0;i<argc;i++)
@@ -85,7 +86,7 @@ int main(void)
                     break;
                 }
                 redirect_append=1;
-                output_file=argv[i+1];
+                entered_file=argv[i+1];
                 argv[i]=NULL;
                 break;
             }
@@ -99,15 +100,31 @@ int main(void)
                     break;
                 }
                 redirect_append=1;
-                output_file=argv[i+1];
+                entered_file=argv[i+1];
+                argv[i]=NULL;
+                break;
+            }
+
+            //INPUT REDIRECTION
+            if(strcmp(argv[i],"<")==0)
+            {
+                if(argv[i+1]==NULL)
+                {
+                    fprintf(stderr,"myshell:expected filename after <");
+                    syntax_error=1;
+                    break;
+                    
+                }
+                redirect_input=1;
+                entered_file=argv[i+1];
                 argv[i]=NULL;
                 break;
             }
         }
         // printf("redirect=%d\n",redirect);
-        // if(output_file!=NULL)
+        // if(entered_file!=NULL)
         // {
-        //     printf("output_file=%s\n",output_file);
+        //     printf("entered_file=%s\n",entered_file);
         // }
         if(syntax_error)
         {
@@ -128,7 +145,7 @@ int main(void)
             // perror("Failed");
             // return 1;
         //EXECVP implementation
-        // int fd=open(output_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
+        // int fd=open(entered_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
         // if(fd==-1)
         // {
         //     perror("failed to open: \n");
@@ -139,7 +156,7 @@ int main(void)
         //IMPLEMENTED REDIRECTION(>)
         if(redirect==1)
         {
-            int fd=open(output_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
+            int fd=open(entered_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
             if(fd==-1)
             {
                 perror("Failed to open: \n");
@@ -155,7 +172,7 @@ int main(void)
         }
         if(redirect_append==1)
         {
-             int fd=open(output_file,O_WRONLY|O_APPEND|O_CREAT,0644);
+             int fd=open(entered_file,O_WRONLY|O_APPEND|O_CREAT,0644);
             if(fd==-1)
             {
                 perror("Failed to open: \n");
@@ -168,6 +185,25 @@ int main(void)
                 return 1;
             }
             close(fd);
+        }
+        if(redirect_input==1)
+        {
+            int fd=open(entered_file,O_RDONLY,0644);
+            {
+                if(fd==-1)
+                {
+                    perror("Failed to open: \n");
+                    return 1;
+                }
+                int dval=dup2(fd,STDIN_FILENO);
+                if(dval==-1)
+                {
+                    perror("fail: \n");
+                    return 1;
+
+                }
+                close(fd);
+            }
         }
 
         if(execvp(argv[0],argv)==-1)
