@@ -68,6 +68,7 @@ int main(void)
             continue;
         }
         int redirect=0;
+        int redirect_append=0;
         char *output_file=NULL;
         int syntax_error=0;
 
@@ -83,7 +84,21 @@ int main(void)
                     syntax_error=1;
                     break;
                 }
-                redirect=1;
+                redirect_append=1;
+                output_file=argv[i+1];
+                argv[i]=NULL;
+                break;
+            }
+
+            if(strcmp(argv[i],">>")==0)
+            {
+                if(argv[i+1]==NULL)
+                {
+                    fprintf(stderr,"myshell:expeected filename after >> \n");
+                    syntax_error=1;
+                    break;
+                }
+                redirect_append=1;
                 output_file=argv[i+1];
                 argv[i]=NULL;
                 break;
@@ -125,6 +140,22 @@ int main(void)
         if(redirect==1)
         {
             int fd=open(output_file,O_WRONLY|O_TRUNC|O_CREAT,0644);
+            if(fd==-1)
+            {
+                perror("Failed to open: \n");
+                return 1;
+            }
+            int dval=dup2(fd,STDOUT_FILENO);
+            if(dval==-1)
+            {
+                perror("fail \n");
+                return 1;
+            }
+            close(fd);
+        }
+        if(redirect_append==1)
+        {
+             int fd=open(output_file,O_WRONLY|O_APPEND|O_CREAT,0644);
             if(fd==-1)
             {
                 perror("Failed to open: \n");
